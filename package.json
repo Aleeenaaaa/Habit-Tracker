@@ -1,0 +1,14 @@
+{
+  "name": "habit-tracker",
+  "version": "1.0.0",
+  "description": "Simple habit tracker with backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Aleena Jose",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

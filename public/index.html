@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DailyBloom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ffd1dc, #ffe4ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      width: 420px;
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: 28px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 15px;
+      border: 1px solid #eee;
+      margin-bottom: 12px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 12px;
+      background: #ff7eb3;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    li {
+      background: #fff0f5;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .streak {
+      font-size: 12px;
+      color: #ff7eb3;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div style="font-size:50px;">🌸</div>
+  <h1>DailyBloom</h1>
+  <div class="tagline">“Small steps, big progress.”</div>
+
+  <input id="habitInput" placeholder="Enter a new habit..." />
+  <button onclick="addHabit()">Add</button>
+
+  <ul id="habitList"></ul>
+</div>
+
+<script>
+async function loadHabits() {
+  const res = await fetch("/habits");
+  const habits = await res.json();
+
+  const list = document.getElementById("habitList");
+  list.innerHTML = "";
+
+  habits.forEach(h => {
+    const li = document.createElement("li");
+
+    const name = document.createElement("span");
+    name.textContent = h.name + " ";
+    if (h.completed) name.classList.add("completed");
+
+    const streak = document.createElement("span");
+    streak.className = "streak";
+    streak.textContent = `🔥 ${h.streak}`;
+
+    const actions = document.createElement("div");
+
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = "✓";
+    completeBtn.onclick = () => toggleHabit(h.id);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑";
+    deleteBtn.onclick = () => deleteHabit(h.id);
+
+    actions.appendChild(completeBtn);
+    actions.appendChild(deleteBtn);
+
+    li.appendChild(name);
+    li.appendChild(streak);
+    li.appendChild(actions);
+
+    list.appendChild(li);
+  });
+}
+
+async function addHabit() {
+  const habit = document.getElementById("habitInput").value;
+  if (!habit) return;
+
+  await fetch("/habits", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ habit })
+  });
+
+  document.getElementById("habitInput").value = "";
+  loadHabits();
+}
+
+async function toggleHabit(id) {
+  await fetch(`/habits/${id}`, { method: "PUT" });
+  loadHabits();
+}
+
+async function deleteHabit(id) {
+  await fetch(`/habits/${id}`, { method: "DELETE" });
+  loadHabits();
+}
+
+loadHabits();
+</script>
+
+</body>
+</html>
