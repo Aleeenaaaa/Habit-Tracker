@@ -98,10 +98,22 @@
 </div>
 
 <script>
-async function loadHabits() {
-  const res = await fetch("/habits");
-  const habits = await res.json();
+function getHabits() {
+  return JSON.parse(localStorage.getItem("habits")) || [];
+}
 
+function saveHabits(habits) {
+  localStorage.setItem("habits", JSON.stringify(habits));
+}
+
+function updateSummary(habits) {
+  document.getElementById("totalHabits").innerText = habits.length;
+  const totalStreak = habits.reduce((sum, h) => sum + h.streak, 0);
+  document.getElementById("totalStreak").innerText = totalStreak;
+}
+
+function loadHabits() {
+  const habits = getHabits();
   const list = document.getElementById("habitList");
   list.innerHTML = "";
 
@@ -109,7 +121,7 @@ async function loadHabits() {
     const li = document.createElement("li");
 
     const name = document.createElement("span");
-    name.textContent = h.name + " ";
+    name.textContent = h.name;
     if (h.completed) name.classList.add("completed");
 
     const streak = document.createElement("span");
@@ -120,6 +132,12 @@ async function loadHabits() {
 
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "✓";
+
+    if (h.completed) {
+      completeBtn.disabled = true;
+      completeBtn.style.opacity = "0.5";
+    }
+
     completeBtn.onclick = () => toggleHabit(h.id);
 
     const deleteBtn = document.createElement("button");
@@ -135,35 +153,62 @@ async function loadHabits() {
 
     list.appendChild(li);
   });
+
   updateSummary(habits);
 }
-function updateSummary(habits) {
-  document.getElementById("totalHabits").innerText = habits.length;
 
-  const totalStreak = habits.reduce((sum, habit) => sum + habit.streak, 0);
-  document.getElementById("totalStreak").innerText = totalStreak;
-}
-async function addHabit() {
-  const habit = document.getElementById("habitInput").value;
-  if (!habit) return;
+function addHabit() {
+  const input = document.getElementById("habitInput");
+  const habitName = input.value.trim();
+  if (!habitName) return;
 
-  await fetch("/habits", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ habit })
+  const habits = getHabits();
+
+  habits.push({
+    id: Date.now(),
+    name: habitName,
+    streak: 0,
+    completed: false,
+    lastCompletedDate: null
   });
 
-  document.getElementById("habitInput").value = "";
+  saveHabits(habits);
+  input.value = "";
   loadHabits();
 }
 
-async function toggleHabit(id) {
-  await fetch(`/habits/${id}`, { method: "PUT" });
+function toggleHabit(id) {
+  const habits = getHabits();
+  const habit = habits.find(h => h.id === id);
+  const today = new Date().toISOString().split("T")[0];
+
+  if (!habit.lastCompletedDate) {
+    habit.streak = 1;
+  } else {
+    const lastDate = new Date(habit.lastCompletedDate);
+    const currentDate = new Date(today);
+    const diffDays = (currentDate - lastDate) / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 1) {
+      habit.streak += 1;
+    } else if (diffDays > 1) {
+      habit.streak = 1;
+    } else {
+      return;
+    }
+  }
+
+  habit.completed = true;
+  habit.lastCompletedDate = today;
+
+  saveHabits(habits);
   loadHabits();
 }
 
-async function deleteHabit(id) {
-  await fetch(`/habits/${id}`, { method: "DELETE" });
+function deleteHabit(id) {
+  let habits = getHabits();
+  habits = habits.filter(h => h.id !== id);
+  saveHabits(habits);
   loadHabits();
 }
 
