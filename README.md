@@ -93,14 +93,10 @@ https://habit-tracker-1sms.onrender.com
 
 #### Screenshots (Add at least 3)
 
-![
-  
-](<Screenshot 2026-02-28 194957.png>)
-shows Intro page
+    <img width="1600" height="1058" alt="Screenshot 2026-02-28 194957" src="https://github.com/user-attachments/assets/99ad2948-cfb3-4943-9254-83f192b06f54" />
+<img width="1842" height="1053" alt="Screenshot 2026-02-28 194939" src="https://github.com/user-attachments/assets/940e0335-21a5-4458-ae84-114476550a50" />
+<img width="1576" height="1052" alt="Screenshot 2026-02-28 195031" src="https://github.com/user-attachments/assets/4ee0dd05-22c1-4d3a-b9dd-7c3b02b0493f" />
 
-![alt text](<Screenshot 2026-02-28 195031.png>)
-
-![alt text](<Screenshot 2026-02-28 195031-1.png>)
 
 
 ---
