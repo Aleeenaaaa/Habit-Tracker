@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -34,7 +34,8 @@ app.post("/habits", (req, res) => {
     id: Date.now(),
     name: req.body.habit,
     completed: false,
-    streak: 0
+    streak: 0,
+    lastCompletedDate: null
   };
 
   habits.push(newHabit);
@@ -49,10 +50,29 @@ app.put("/habits/:id", (req, res) => {
   const habit = habits.find(h => h.id == req.params.id);
 
   if (habit) {
-    habit.completed = !habit.completed;
-    if (habit.completed) {
-      habit.streak += 1;
+    const today = new Date().toISOString().split("T")[0];
+
+    if (!habit.lastCompletedDate) {
+      habit.streak = 1;
+    } else {
+      const lastDate = new Date(habit.lastCompletedDate);
+      const currentDate = new Date(today);
+
+      const diffTime = currentDate - lastDate;
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      if (diffDays === 1) {
+        habit.streak += 1; // completed yesterday
+      } else if (diffDays > 1) {
+        habit.streak = 1; // missed day
+      } else {
+        return res.json(habit); // already completed today
+      }
     }
+
+    habit.completed = true;
+    habit.lastCompletedDate = today;
+
     saveHabits(habits);
     res.json(habit);
   }

@@ -4,5 +4,12 @@
     "name": "Study 2 Hours",
     "completed": true,
     "streak": 2
+  },
+  {
+    "id": 1772271042859,
+    "name": "Drink water",
+    "completed": true,
+    "streak": 1,
+    "lastCompletedDate": "2026-02-28"
   }
 ]
