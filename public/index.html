@@ -87,7 +87,10 @@
   <div style="font-size:50px;">🌸</div>
   <h1>DailyBloom</h1>
   <div class="tagline">“Small steps, big progress.”</div>
-
+  <div id="summary" style="margin-bottom:15px;">
+  <div><strong>Total Habits:</strong> <span id="totalHabits">0</span></div>
+  <div><strong>Total Streak Points:</strong> <span id="totalStreak">0</span></div>
+</div>
   <input id="habitInput" placeholder="Enter a new habit..." />
   <button onclick="addHabit()">Add</button>
 
@@ -132,8 +135,14 @@ async function loadHabits() {
 
     list.appendChild(li);
   });
+  updateSummary(habits);
 }
+function updateSummary(habits) {
+  document.getElementById("totalHabits").innerText = habits.length;
 
+  const totalStreak = habits.reduce((sum, habit) => sum + habit.streak, 0);
+  document.getElementById("totalStreak").innerText = totalStreak;
+}
 async function addHabit() {
   const habit = document.getElementById("habitInput").value;
   if (!habit) return;
